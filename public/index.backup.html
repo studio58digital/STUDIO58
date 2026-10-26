@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STUDIO58 DIGITAL - AI Generator Studio</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#070a11',
+              darker: '#04060a',
+              card: '#0c1322',
+              cardBorder: '#162238',
+              blue: '#00a8ff',
+              cyan: '#00f0ff',
+              glow: '#0099ff',
+              accent: '#38bdf8'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Glow Effects & Aesthetics */
+    .neon-glow {
+      box-shadow: 0 0 35px -5px rgba(0, 168, 255, 0.35);
+    }
+    .neon-border-glow:focus-within {
+      border-color: #00a8ff;
+      box-shadow: 0 0 20px -2px rgba(0, 168, 255, 0.4);
+    }
+    .glass-panel {
+      background: rgba(12, 19, 34, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(30, 48, 80, 0.6);
+    }
+    /* Custom Scrollbar for Code Blocks */
+    pre::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    pre::-webkit-scrollbar-track {
+      background: #090e1a;
+    }
+    pre::-webkit-scrollbar-thumb {
+      background: #1c2b48;
+      border-radius: 4px;
+    }
+    pre::-webkit-scrollbar-thumb:hover {
+      background: #00a8ff;
+    }
+  </style>
+</head>
+<body class="bg-[#05080f] text-slate-100 font-sans antialiased min-h-screen selection:bg-brand-blue selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- NAVBAR GLOBAL -->
+  <!-- ========================================== -->
+  <header class="border-b border-[#131d31] bg-[#070b14]/90 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-5 h-20 flex items-center justify-between">
+      <!-- Brand Logo STUDIO58 -->
+      <div class="flex items-center gap-3.5 cursor-pointer" onclick="goToView('view-login')">
+        <div class="relative w-11 h-11 flex items-center justify-center">
+          <!-- Isometric Cube Logo SVG -->
+          <svg class="w-11 h-11 filter drop-shadow-[0_0_10px_rgba(0,168,255,0.7)]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Top Face -->
+            <polygon points="100,20 170,60 100,100 30,60" fill="#60baff"/>
+            <!-- Left Face -->
+            <polygon points="30,60 100,100 100,180 30,140" fill="#1d66db"/>
+            <!-- Right Face -->
+            <polygon points="100,100 170,60 170,140 100,180" fill="#0c44a7"/>
+            <!-- Inner Glow Lines -->
+            <path d="M100 20 L100 100 M30 60 L100 100 M170 60 L100 100" stroke="#bfe5ff" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <div>
+          <span class="text-2xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1">
+            STUDIO<span class="text-brand-blue">58</span>
+          </span>
+          <span class="text-[10px] tracking-[0.25em] text-cyan-400 font-bold block uppercase -mt-1">Digital AI Lab</span>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div id="nav-actions">
+        <button id="nav-login-btn" onclick="goToView('view-app')" class="hidden md:flex items-center gap-2 bg-[#0d1c33] border border-[#1d355c] hover:border-brand-blue text-slate-200 hover:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300">
+          <i data-lucide="log-in" class="w-4 h-4 text-brand-blue"></i>
+          Masuk Member Area
+        </button>
+
+        <div id="nav-user-logged" class="hidden flex items-center gap-4">
+          <span class="text-xs bg-[#0f2442] border border-[#1b3d6f] px-3 py-1.5 rounded-full text-brand-cyan font-medium flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Member VIP
+          </span>
+          <button onclick="handleLogout()" class="flex items-center gap-2 text-xs bg-red-950/40 border border-red-800/50 hover:bg-red-900/40 text-red-300 px-3.5 py-1.5 rounded-lg transition-colors">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Keluar
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- TAMPILAN 1: LOGIN PENGGUNA -->
+  <!-- ========================================== -->
+  <main id="view-login" class="min-h-[calc(100vh-80px)] flex items-center justify-center p-6 relative overflow-hidden">
+    <!-- Background Ambient Glows -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-brand-blue/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-brand-cyan/15 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="w-full max-w-md relative z-10">
+      <!-- Tag Studio58 Platform -->
+      <div class="flex justify-center mb-6">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-cardBorder bg-[#091120] text-xs font-semibold text-brand-cyan shadow-inner">
+          <span class="w-2 h-2 rounded-full bg-brand-cyan animate-ping"></span>
+          Studio58 AI Learning & Generation Platform
+        </div>
+      </div>
+
+      <!-- Login Card -->
+      <div class="glass-panel rounded-2xl p-8 shadow-2xl relative border border-[#192b4a]">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-extrabold text-white tracking-tight">Masuk Akun</h1>
+          <p class="text-slate-400 text-sm mt-2">Akses Generator Prompt Storyboard & Master Video AI</p>
+        </div>
+
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-5">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Email Member</label>
+            <div class="relative rounded-xl border border-[#1e3052] bg-[#070c17] transition-all neon-border-glow">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </span>
+              <input type="email" id="login-email" required value="member@studio58.ai" class="w-full bg-transparent pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none" placeholder="nama@email.com">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300">Password</label>
+              <a href="#" class="text-xs text-brand-blue hover:underline">Lupa Sandi?</a>
+            </div>
+            <div class="relative rounded-xl border border-[#1e3052] bg-[#070c17] transition-all neon-border-glow">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+              </span>
+              <input type="password" id="login-pass" required value="••••••••" class="w-full bg-transparent pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none" placeholder="••••••••">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" class="w-full relative group overflow-hidden bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-3.5 px-6 rounded-xl transition duration-300 shadow-[0_0_20px_rgba(0,168,255,0.4)] flex items-center justify-center gap-2">
+              <span>Masuk ke Member Area</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-[#131d31] text-center">
+          <p class="text-xs text-slate-400">Butuh bantuan pendaftaran modul VIP? 
+            <a href="https://wa.me/" target="_blank" class="text-brand-blue font-semibold hover:underline inline-flex items-center gap-1 ml-1">
+              <i data-lucide="message-square" class="w-3 h-3"></i> Hubungi Admin
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- TAMPILAN 2: GENERATOR PROMPT WORKSPACE -->
+  <!-- ========================================== -->
+  <main id="view-app" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Top Information Banner -->
+    <div class="mb-8 p-6 rounded-2xl bg-gradient-to-r from-[#0b162a] via-[#091122] to-[#0b182d] border border-[#1a2f54] shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-700/50 text-[11px] font-bold text-cyan-300 mb-2">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> STUDIO58 CREATIVE DIRECTOR ENGINE
+        </div>
+        <h2 class="text-2xl font-black text-white tracking-tight">Storyboard & Master Video Prompt Generator</h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+          Menghasilkan prompt terstruktur ultra-detail per scene yang kompatibel langsung untuk Google Flow, AI Video & AI Image generator.
+        </p>
+      </div>
+      <!-- API KEY Trigger Modal Button -->
+      <button onclick="toggleKeyModal(true)" class="relative z-10 shrink-0 inline-flex items-center gap-2 bg-[#12223c] border border-[#234375] hover:border-brand-blue text-xs font-semibold px-4 py-2.5 rounded-xl text-slate-200 transition-all">
+        <i data-lucide="key" class="w-4 h-4 text-cyan-400"></i>
+        <span id="api-status-label">Setup Gemini API Key</span>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- ======================================== -->
+      <!-- KOLOM KIRI: FORM KONTROL PARAMETER (5/12) -->
+      <!-- ======================================== -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="glass-panel p-6 rounded-2xl border border-[#192b4a] shadow-xl">
+          <h3 class="text-base font-bold text-white flex items-center gap-2 mb-5 pb-3 border-b border-[#142036]">
+            <i data-lucide="sliders" class="w-4 h-4 text-brand-blue"></i> Konfigurasi Video & Karakter
+          </h3>
+
+          <form id="generator-form" onsubmit="handleGenerate(event)" class="space-y-4 text-sm">
+            
+            <!-- 1. Master Character Image Upload (Preview) -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Foto Master Karakter / Produk</span>
+                <span class="text-[10px] text-slate-400">Identity Lock</span>
+              </label>
+              <div class="border-2 border-dashed border-[#1f355c] hover:border-brand-blue bg-[#070c17] rounded-xl p-4 text-center cursor-pointer transition relative group" onclick="document.getElementById('char-file').click()">
+                <input type="file" id="char-file" accept="image/*" class="hidden" onchange="previewImage(this)">
+                
+                <div id="upload-placeholder" class="py-3">
+                  <div class="w-10 h-10 mx-auto rounded-full bg-[#111f38] flex items-center justify-center text-brand-blue mb-2 group-hover:scale-110 transition-transform">
+                    <i data-lucide="image-plus" class="w-5 h-5"></i>
+                  </div>
+                  <p class="text-xs text-slate-300 font-medium">Klik untuk upload foto master</p>
+                  <p class="text-[10px] text-slate-500 mt-0.5">PNG, JPG, WebP (Maks 5MB)</p>
+                </div>
+
+                <div id="upload-preview" class="hidden flex items-center gap-3">
+                  <img id="preview-img" src="" class="w-14 h-14 object-cover rounded-lg border border-brand-blue/50">
+                  <div class="text-left overflow-hidden">
+                    <p id="preview-name" class="text-xs font-medium text-white truncate"></p>
+                    <span class="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
+                      <i data-lucide="check-circle" class="w-3 h-3"></i> Karakter Terkunci
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nama & Detail Produk/Karakter -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Produk / Model</label>
+                <input type="text" id="product-name" required placeholder="Cth: Serum Glow 58" class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Aspek Rasio</label>
+                <select id="aspect-ratio" class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+                  <option value="9:16 (Vertikal TikTok/Reels)">9:16 (TikTok / Reels / Shorts)</option>
+                  <option value="16:9 (Landscape YouTube)">16:9 (Landscape YouTube / PC)</option>
+                  <option value="1:1 (Square Feed)">1:1 (Square Feed Instagram)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Jumlah Scene & Narasi Mode -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Jumlah Adegan (Scene)</label>
+                <select id="scene-count" class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+                  <option value="1">1 Scene (Single Shot Highlight)</option>
+                  <option value="3" selected>3 Scene (Hook - Detail - CTA)</option>
+                  <option value="4">4 Scene (Full Storyboard)</option>
+                  <option value="5">5 Scene (Comprehensive Showcase)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Tipe Percakapan</label>
+                <select id="dialog-type" class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+                  <option value="Menggunakan Narasi & Dialog">Pakai Narasi / Dialog</option>
+                  <option value="Tanpa Narasi (Visual & Sound FX Only)">Tanpa Narasi (Silent / Mute)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Mode Audio & Bahasa Text Overlay -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Mode Audio</label>
+                <select id="audio-mode" class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+                  <option value="Voice Over & ASMR">Voice Over & ASMR</option>
+                  <option value="ASMR Saja">ASMR Saja (Tapping, Crisp Sound)</option>
+                  <option value="Voice Over Saja">Voice Over Saja</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Bahasa Text Overlay</label>
+                <select id="overlay-lang" class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+                  <option value="Bahasa Indonesia Gaul / Gen-Z (Spidol Putih)">Indonesia Gaul / Gen-Z</option>
+                  <option value="Bahasa Indonesia Formal / Professional">Indonesia Formal</option>
+                  <option value="English (Aesthetic TikTok Style)">English (US / Casual)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Deskripsi Konsep Video -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi Konsep Video</label>
+              <textarea id="concept-desc" rows="3" required placeholder="Contoh: Video unboxing aesthetic faceless POV hand-only, unboxing paket di atas meja kayu estetik dengan pencahayaan soft window morning light..." class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-blue"></textarea>
+            </div>
+
+            <!-- Action Generate Button -->
+            <button type="submit" id="btn-generate" class="w-full relative group overflow-hidden bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-3.5 rounded-xl transition duration-300 shadow-[0_0_20px_rgba(0,168,255,0.4)] flex items-center justify-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Generate Prompt Sekarang</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ======================================== -->
+      <!-- KOLOM KANAN: HASIL PROMPT VIEWPORT (7/12) -->
+      <!-- ======================================== -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Prompt Box Output Display (Sesuai Referensi Gambar 6) -->
+        <div class="glass-panel rounded-2xl border border-[#1b2b48] shadow-2xl p-6 relative overflow-hidden min-h-[580px] flex flex-col justify-between">
+          
+          <div>
+            <!-- Header Result Box -->
+            <div class="flex items-center justify-between border-b border-[#18263f] pb-4 mb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 rounded-lg bg-[#0f1d33] border border-[#21385f]">
+                  <i data-lucide="code-2" class="w-5 h-5 text-brand-blue"></i>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-white tracking-wide uppercase">Hasil Master Sheet & Video Prompt</h4>
+                  <p class="text-[11px] text-slate-400">Siap disalin ke Google Flow / Midjourney / Haiper / Runway</p>
+                </div>
+              </div>
+
+              <!-- Ready & Locked Badge -->
+              <span id="badge-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-400 border border-emerald-800/60">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i> Standby
+              </span>
+            </div>
+
+            <!-- Terminal Header Bar -->
+            <div class="flex items-center justify-between bg-[#080d1a] border border-[#192742] rounded-t-xl px-4 py-2.5 text-xs text-slate-400">
+              <div class="flex items-center gap-2">
+                <i data-lucide="terminal" class="w-3.5 h-3.5 text-brand-blue"></i>
+                <span class="font-mono text-[11px] uppercase tracking-wider text-slate-300">KODE PROMPT MASTER SCENE</span>
+              </div>
+              <button onclick="copyToClipboard()" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#13223d] hover:bg-brand-blue hover:text-white border border-[#233a63] text-brand-cyan text-xs font-semibold transition-all">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin Kode
+              </button>
+            </div>
+
+            <!-- Terminal Output Area -->
+            <div class="relative bg-[#050811] border-x border-b border-[#192742] rounded-b-xl p-4">
+              <div id="loading-spinner" class="hidden py-24 text-center">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-brand-blue mb-4"></div>
+                <p class="text-sm font-medium text-slate-300">STUDIO58 Director sedang meracik storyboard & prompt video...</p>
+                <p class="text-xs text-slate-500 mt-1">Mengunci identitas master karakter & kalkulasi timestamp audio</p>
+              </div>
+
+              <pre id="output-code" class="font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed overflow-y-auto max-h-[460px] p-1 selection:bg-brand-blue">CREATE MASTER CHARACTER IDENTITY SHEET & VIDEO STORYBOARD FROM THE INPUT DATA.
+
+Menunggu input data konfigurasi...
+Silakan isi form di sebelah kiri dan klik tombol "Generate Prompt Sekarang" untuk menghasilkan Master Prompt Gambar, Master Prompt Video per detik, dan Text Narasi Voiceover.</pre>
+            </div>
+          </div>
+
+          <!-- Scene Pagination / Flow Control Action -->
+          <div id="scene-controls" class="hidden mt-4 pt-4 border-t border-[#18263f] flex items-center justify-between">
+            <span id="scene-indicator" class="text-xs text-slate-400 font-mono">SCENE: 1 / 3</span>
+            <button onclick="generateNextScene()" id="btn-next-scene" class="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-md">
+              <span>Lanjut ke Scene Berikutnya</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Petunjuk Integrasi Google Flow (Gambar 3 Referensi) -->
+    <div class="mt-12 glass-panel p-6 rounded-2xl border border-[#1b2f52]">
+      <h4 class="text-sm font-bold text-white flex items-center gap-2 mb-4">
+        <i data-lucide="git-branch" class="w-4 h-4 text-cyan-400"></i> Alur Kerja Eksekusi Google Flow & AI Video
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+        <div class="p-3.5 rounded-xl bg-[#080d19] border border-[#162540]">
+          <span class="text-brand-blue font-mono font-bold block mb-1">LANGKAH 1</span>
+          <p class="text-slate-300 font-semibold mb-0.5">Upload Foto & Konsep</p>
+          <p class="text-slate-500 text-[11px]">Kunci identitas wajah/produk di Studio58 generator.</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-[#080d19] border border-[#162540]">
+          <span class="text-cyan-400 font-mono font-bold block mb-1">LANGKAH 2</span>
+          <p class="text-slate-300 font-semibold mb-0.5">Gemini Master Logic</p>
+          <p class="text-slate-500 text-[11px]">Menyusun breakdown timestamp panel, visual direction & ASMR.</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-[#080d19] border border-[#162540]">
+          <span class="text-brand-blue font-mono font-bold block mb-1">LANGKAH 3</span>
+          <p class="text-slate-300 font-semibold mb-0.5">Prompt Gambar & Video</p>
+          <p class="text-slate-500 text-[11px]">Salin prompt siap pakai untuk setiap potongan adegan (scene).</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-[#080d19] border border-[#162540]">
+          <span class="text-emerald-400 font-mono font-bold block mb-1">LANGKAH 4</span>
+          <p class="text-slate-300 font-semibold mb-0.5">Generate di Google Flow</p>
+          <p class="text-slate-500 text-[11px]">Tempelkan kode di Google Flow / Runway untuk hasil video akhir.</p>
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-4 border-t border-[#131f36] pt-3">
+        <span class="font-semibold text-brand-blue">Penting:</span> Website ini menghasilkan master teks instruksi (prompt). Eksekusi rendering visual dapat dilakukan pada tools generator pilihan kamu seperti Google Flow, Midjourney, Kling, ataupun Runway.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: API KEY GEMINI SETUP -->
+  <!-- ========================================== -->
+  <div id="modal-api" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md p-6 rounded-2xl border border-brand-cardBorder shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="key" class="w-4 h-4 text-brand-blue"></i> Pengaturan Gemini API
+        </h3>
+        <button onclick="toggleKeyModal(false)" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Masukkan Google Gemini API Key milikmu untuk langsung menghubungkan engine generator ini secara real-time. Jika dikosongkan, sistem akan beralih ke <strong>Studio58 Native Offline Engine</strong>.
+      </p>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Google AI Gemini API Key</label>
+        <input type="password" id="input-gemini-key" placeholder="AIzaSy..." class="w-full bg-[#070c17] border border-[#1e3052] rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-blue">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="toggleKeyModal(false)" class="px-4 py-2 text-xs font-medium text-slate-300 hover:bg-[#132038] rounded-lg">Batal</button>
+        <button onclick="saveApiKey()" class="px-4 py-2 text-xs font-bold bg-brand-blue hover:bg-sky-400 text-white rounded-lg">Simpan API Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TOAST NOTIFICATION (Sesuai Desain Gambar 6) -->
+  <!-- ========================================== -->
+  <div id="toast-copied" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="flex items-center gap-3 bg-[#0a1526]/95 border border-[#1b3e70] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
+      <div class="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+        <i data-lucide="check" class="w-4 h-4"></i>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-white">Berhasil Disalin!</p>
+        <p class="text-[11px] text-slate-400">Kode Master Prompt telah disalin ke clipboard.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <!-- ========================================== -->
+  <script>
+    // Inisialisasi ikon Lucide
+    lucide.createIcons();
+
+    // Application State
+    let geminiApiKey = localStorage.getItem('s58_gemini_key') || '';
+    let currentScene = 1;
+    let totalScenes = 3;
+    let uploadedImageBase64 = null;
+    let cachedFormData = null;
+
+    if (geminiApiKey) {
+      updateApiStatusBadge(true);
+    }
+
+    // Navigasi Antar Tampilan (View Switching)
+    function goToView(viewId) {
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-app').classList.add('hidden');
+      document.getElementById(viewId).classList.remove('hidden');
+
+      const navLoginBtn = document.getElementById('nav-login-btn');
+      const navUserLogged = document.getElementById('nav-user-logged');
+
+      if (viewId === 'view-app') {
+        navLoginBtn.classList.add('hidden');
+        navUserLogged.classList.remove('hidden');
+      } else {
+        navLoginBtn.classList.remove('hidden');
+        navUserLogged.classList.add('hidden');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      goToView('view-app');
+    }
+
+    function handleLogout() {
+      goToView('view-login');
+    }
+
+    // Modal API Key Handling
+    function toggleKeyModal(show) {
+      const modal = document.getElementById('modal-api');
+      if (show) {
+        modal.classList.remove('hidden');
+        document.getElementById('input-gemini-key').value = geminiApiKey;
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function saveApiKey() {
+      const keyVal = document.getElementById('input-gemini-key').value.trim();
+      geminiApiKey = keyVal;
+      localStorage.setItem('s58_gemini_key', keyVal);
+      updateApiStatusBadge(!!keyVal);
+      toggleKeyModal(false);
+    }
+
+    function updateApiStatusBadge(isConnected) {
+      const label = document.getElementById('api-status-label');
+      if (isConnected) {
+        label.innerHTML = '<span class="text-emerald-400">Gemini API Aktif</span>';
+      } else {
+        label.textContent = 'Setup Gemini API Key';
+      }
+    }
+
+    // Image Upload & Preview Handler
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          uploadedImageBase64 = e.target.result;
+          document.getElementById('upload-placeholder').classList.add('hidden');
+          const previewWrap = document.getElementById('upload-preview');
+          previewWrap.classList.remove('hidden');
+          document.getElementById('preview-img').src = e.target.result;
+          document.getElementById('preview-name').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Core Prompt Generator Logic
+    async function handleGenerate(e) {
+      e.preventDefault();
+
+      // Collect Data
+      cachedFormData = {
+        productName: document.getElementById('product-name').value,
+        aspectRatio: document.getElementById('aspect-ratio').value,
+        sceneCount: parseInt(document.getElementById('scene-count').value),
+        dialogType: document.getElementById('dialog-type').value,
+        audioMode: document.getElementById('audio-mode').value,
+        overlayLang: document.getElementById('overlay-lang').value,
+        conceptDesc: document.getElementById('concept-desc').value,
+        hasImage: !!uploadedImageBase64
+      };
+
+      currentScene = 1;
+      totalScenes = cachedFormData.sceneCount;
+
+      await renderSceneOutput(currentScene, cachedFormData);
+    }
+
+    async function generateNextScene() {
+      if (currentScene < totalScenes) {
+        currentScene++;
+        await renderSceneOutput(currentScene, cachedFormData);
+      }
+    }
+
+    // Process Scene with Gemini or High-Fidelity Master Template Engine
+    async function renderSceneOutput(sceneNumber, data) {
+      const outCode = document.getElementById('output-code');
+      const loader = document.getElementById('loading-spinner');
+      const sceneControls = document.getElementById('scene-controls');
+      const sceneIndicator = document.getElementById('scene-indicator');
+      const badgeStatus = document.getElementById('badge-status');
+
+      outCode.classList.add('hidden');
+      loader.classList.remove('hidden');
+      sceneControls.classList.add('hidden');
+
+      try {
+        let generatedText = "";
+
+        if (geminiApiKey) {
+          // Live Gemini API Call
+          generatedText = await callGeminiAPI(sceneNumber, data);
+        } else {
+          // Fallback Local Master Engine (Persis Instruksi Spesifikasi Master Prompt Studio58)
+          await new Promise(r => setTimeout(r, 900)); // Simulasi berpikir
+          generatedText = generateMasterPromptLocally(sceneNumber, data);
+        }
+
+        outCode.textContent = generatedText;
+        badgeStatus.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 text-emerald-400 border border-emerald-800/60";
+        badgeStatus.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Ready & Locked (Scene ${sceneNumber})`;
+
+        // Show Next Scene Controls if more scenes exist
+        if (sceneNumber < totalScenes) {
+          sceneControls.classList.remove('hidden');
+          sceneIndicator.textContent = `SCENE: ${sceneNumber} / ${totalScenes}`;
+          document.getElementById('btn-next-scene').innerHTML = `<span>Lanjut ke Scene ${sceneNumber + 1}</span> <i data-lucide="chevron-right" class="w-4 h-4"></i>`;
+        } else {
+          sceneControls.classList.remove('hidden');
+          sceneIndicator.textContent = `STATUS: SEMUA SCENE SELESAI (${totalScenes}/${totalScenes})`;
+          document.getElementById('btn-next-scene').classList.add('hidden');
+        }
+
+      } catch (err) {
+        outCode.textContent = `[ERROR]: Gagal menghasilkan prompt. Detail: ${err.message}\nSilakan gunakan template offline bawaan sistem.`;
+      } finally {
+        loader.classList.add('hidden');
+        outCode.classList.remove('hidden');
+        lucide.createIcons();
+      }
+    }
+
+    // Template Generator Sesuai Format Eksak Master Prompt Studio58
+    function generateMasterPromptLocally(scene, data) {
+      const isVoice = data.audioMode.includes("Voice Over");
+      const isAsmr = data.audioMode.includes("ASMR");
+      const isFinalScene = scene === totalScenes;
+
+      return `================================================================================
+CREATE MASTER CHARACTER IDENTITY SHEET & VIDEO STORYBOARD — STUDIO58 DIGITAL
+================================================================================
+KONFIRMASI RACIKAN:
+• Nama Produk/Barang  : ${data.productName}
+• Detail Karakter     : ${data.hasImage ? 'Master Karakter Terkunci dari Gambar Upload' : 'Identitas Alami Realistis'}
+• Aspek Rasio Video   : ${data.aspectRatio}
+• Durasi Adegan       : 8 Detik
+• Scene Saat Ini      : Scene ${scene} dari ${totalScenes}
+• Mode Audio          : ${data.audioMode}
+• Bahasa Dialog/Vo    : ${data.dialogType}
+• Bahasa Text Overlay : ${data.overlayLang}
+
+KONSEP CERITA:
+Alur Affiliate Video Scene ${scene}: Hook visual & tactile focus -> product texture exploration -> natural engagement. Konsistensi packaging, tangan talent, dan lighting soft-box daylight dipertahankan tanpa perubahan.
+
+--------------------------------------------------------------------------------
+🖼️ PROMPT GAMBAR — STORYBOARD SCENE ${scene} (8 Panels Continuous / Google Flow)
+--------------------------------------------------------------------------------
+JUDUL STORYBOARD: Showcase Aesthetic & Product Consistency - Scene ${scene}
+REFERENSI PRODUK: High consistency from uploaded model. ${data.productName}.
+GAYA VISUAL: Photorealistic, realistic smartphone UGC, natural lifestyle, clean aesthetic, soft natural daylight, shallow depth of field.
+ASPEK RASIO: ${data.aspectRatio}
+KOMPOSISI: 8 continuous temporal panels (00:00 - 00:08)
+TALENT & TANGAN: Faceless POV hand-only, manicured clean natural nails, forearm visible only, no face, no head.
+
+[PANEL TIMECODE BREAKDOWN]:
+- Panel 1 [00:00-00:01]: Close-up hands gently lifting ${data.productName} on oak desk. Sound: soft cardboard friction.
+- Panel 2 [00:01-00:02]: 45-degree angle, fingertip subtle tap on packaging surface. Sound: rhythmic crisp tapping.
+- Panel 3 [00:02-00:03]: Smooth rotating movement to show side texture and seal authenticity.
+- Panel 4 [00:03-00:04]: Push-in macro shot of product label detail and fine texture.
+- Panel 5 [00:04-00:05]: Product placed securely on center desk with natural subtle shadow.
+- Panel 6 [00:05-00:06]: Hand smoothly entering frame demonstrating usage interaction.
+- Panel 7 [00:06-00:07]: High angle soft focus reveal, product dominant with organic light reflection.
+- Panel 8 [00:07-00:08]: ${isFinalScene ? 'Final showcase position with comfortable resting hand next to product.' : 'Fluid transition movement anticipating subsequent sequence.'}
+
+NEGATIVE PROMPT:
+No face, no head, no visible eyes, no visible mouth, no full body, no third-person camera, no extra hands, no deformed fingers, no duplicated product, no altered logo, no CGI appearance, no plastic artificial sheen, no neon lights.
+
+--------------------------------------------------------------------------------
+🎥 PROMPT VIDEO — STORYBOARD [SCENE ${scene}] — MASTER PROMPT VIDEO FINAL
+--------------------------------------------------------------------------------
+JUDUL VIDEO: "Rahasia Eksklusif ${data.productName} Bikin Nagih"
+SPESIFIKASI VISUAL: ${data.aspectRatio}, 8 detik, Smartphone UGC aesthetic, Handheld natural micro-movement.
+TALENT: Faceless POV hand-only. Only natural hands & forearm entering frame.
+PENCAHAYAAN: Warm morning diffused soft window light, natural environmental ambient reflection.
+KAMERA: POV first-person perspective, handheld dynamic micro-shake, seamless macro lens focus.
+
+TIMELINE PER DETIK:
+• 00:00 - 00:02:
+  - VISUAL: Tangan membuka dan memposisikan ${data.productName} tepat di tengah frame.
+  - CAMERA: Handheld subtle push-in slowly.
+  - VOICEOVER: ${isVoice ? '"Jujur ya, ini racikan paling rapi yang pernah gue temuin..."' : 'Tidak ada voiceover.'}
+  - TEXT OVERLAY: "Unboxing time ✨" (Gaya spidol tulisan tangan putih tebal & stiker hati).
+  - ASMR SOUND: Crisp unboxing friction & soft finger skin texture sound.
+
+• 00:02 - 00:05:
+  - VISUAL: Ujung jari melakukan subtle tapping di atas material ${data.productName}.
+  - CAMERA: Smooth tilt down 15 derajat, macro focus.
+  - VOICEOVER: ${isVoice ? '"Teksturnya beneran premium, solid dan gak kaleng-kaleng."' : 'Tidak ada voiceover.'}
+  - TEXT OVERLAY: "Teksturnya cakep pol! 🤍" (Goresan melengkung doodle putih).
+  - ASMR SOUND: Clear high-frequency tapping sound, satisfying deep click.
+
+• 00:05 - 00:08:
+  - VISUAL: ${isFinalScene ? `Showcase posisi akhir produk ${data.productName} siap pakai.` : 'Persiapan transisi gerakan tangan ke sudut adegan berikutnya.'}
+  - CAMERA: Steady pull-out gentle focus.
+  - VOICEOVER: ${isVoice ? (isFinalScene ? '"Wajib checkout sekarang di keranjang kuning sebelum kehabisan!"' : '"Kalian harus liat bagian yang ini..."') : 'Tidak ada voiceover.'}
+  - TEXT OVERLAY: ${isFinalScene ? '"Jangan sampai kehabisan ya! 🛒"' : '"Next detail..."'}
+  - ASMR SOUND: Desk wooden resonance & ambient breathing room tone.
+
+NEGATIVE PROMPT:
+No face, no head, no visible eyes, no extra fingers, no distorted nails, no third-person shot, no random background music, no watermark, no CGI glow.
+
+STATUS SCENE ${scene}: SELESAI
+${isFinalScene ? 'STATUS: SEMUA SCENE SELESAI — Prompt siap dipaste langsung ke Google Flow.' : `👉 Ketik / Klik "Lanjut" untuk membuat Scene ${scene + 1}.`}`;
+    }
+
+    // Gemini API Direct Fetch
+    async function callGeminiAPI(scene, data) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+
+      const systemPrompt = `Kamu adalah STUDIO58 Affiliate Creative Director. Buat storyboard scene ${scene} dari total ${data.sceneCount} scene berdasarkan master prompt studio 58. Detail produk: ${data.productName}, Rasio: ${data.aspectRatio}, Mode Audio: ${data.audioMode}, Bahasa: ${data.overlayLang}, Konsep: ${data.conceptDesc}. Berikan prompt gambar storyboard (8 panel breakdown) dan prompt video master timeline detik per detik lengkap dengan ASMR dan text overlay doodle spidol putih.`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: systemPrompt }] }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Gemini API Error: Status ${response.status}`);
+      }
+
+      const resJson = await response.json();
+      return resJson.candidates[0].content.parts[0].text;
+    }
+
+    // Clipboard Copy Helper with Toast
+    function copyToClipboard() {
+      const codeText = document.getElementById('output-code').textContent;
+      navigator.clipboard.writeText(codeText).then(() => {
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast-copied');
+      toast.classList.remove('opacity-0', 'translate-y-20', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-20', 'pointer-events-none');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
