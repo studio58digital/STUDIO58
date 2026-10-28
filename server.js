@@ -138,9 +138,39 @@ VIDEO PROMPT:
       parts.push({ inlineData: item.data });
     }
 
-    const response = await ai.models.generateContent({
+    
+const maxAttempts = 3;
+let response;
+
+for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  try {
+    console.log(`Gemini: percobaan ${attempt}/${maxAttempts}`);
+
+    response = await ai.models.generateContent({
       model: 'gemini-3.8-flash',
       contents: [{ role: 'user', parts }]
+    });
+
+    console.log('Gemini berhasil membuat respons.');
+    break;
+  } catch (error) {
+    const status = Number(error.status ?? error.code);
+    const isTemporary =
+      [408, 429, 500, 502, 503, 504].includes(status) ||
+      /\b(408|429|500|502|503|504)\b/.test(error.message || '');
+
+    console.error(`Gemini gagal pada percobaan ${attempt}:`, error.message);
+
+    if (!isTemporary || attempt === maxAttempts) {
+      throw error;
+    }
+
+    const delay = 1000 * (2 ** (attempt - 1));
+    console.log(`Mencoba lagi dalam ${delay / 1000} detik.`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+}
+
     });
     const text = response.text || '';
     const imageMatch = text.match(/IMAGE PROMPT\s*:\s*([\s\S]*?)(?=\n\s*VIDEO PROMPT\s*:|$)/i);
