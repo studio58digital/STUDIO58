@@ -146,10 +146,15 @@ for (let attempt = 1; attempt <= maxAttempts; attempt++) {
   try {
     console.log(`Gemini: percobaan ${attempt}/${maxAttempts}`);
 
-    response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: [{ role: 'user', parts }]
-    });
+response = await ai.models.generateContent({
+  model: 'gemini-3.8-flash',
+  contents: [{ role: 'user', parts }],
+  config: {
+    thinkingConfig: {
+      thinkingLevel: 'LOW'
+    }
+  }
+});
 
     console.log('Gemini berhasil membuat respons.');
     break;
