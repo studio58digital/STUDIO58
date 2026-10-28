@@ -171,7 +171,6 @@ for (let attempt = 1; attempt <= maxAttempts; attempt++) {
   }
 }
 
-    });
     const text = response.text || '';
     const imageMatch = text.match(/IMAGE PROMPT\s*:\s*([\s\S]*?)(?=\n\s*VIDEO PROMPT\s*:|$)/i);
     const videoMatch = text.match(/VIDEO PROMPT\s*:\s*([\s\S]*)$/i);
