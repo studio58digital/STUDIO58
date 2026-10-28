@@ -170,7 +170,7 @@ response = await ai.models.generateContent({
       throw error;
     }
 
-    const delay = 1000 * (2 ** (attempt - 1));
+    const delay = 2000 * (2 ** (attempt - 1));
     console.log(`Mencoba lagi dalam ${delay / 1000} detik.`);
     await new Promise(resolve => setTimeout(resolve, delay));
   }
