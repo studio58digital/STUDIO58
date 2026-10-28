@@ -171,8 +171,8 @@ response = await ai.models.generateContent({
     }
 
     const delay = 2000 * (2 ** (attempt - 1));
-    console.log(`Mencoba lagi dalam ${delay / 1000} detik.`);
-    await new Promise(resolve => setTimeout(resolve, delay));
+console.log(`Mencoba lagi dalam ${delay / 1000} detik.`);
+await new Promise(resolve => setTimeout(resolve, delay));
   }
 }
 
